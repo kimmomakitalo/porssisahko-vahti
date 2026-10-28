@@ -23,7 +23,7 @@ Varmista, että sähköposti-ilmoitukset ovat päällä: GitHub → Settings →
    git remote add origin https://github.com/kimmomakitalo/porssisahko-vahti.git
    git push -u origin main
    ```
-3. Testaa: **Actions → Pörssisähkövahti → Run workflow**. Halpana päivänä viestiä ei synny, joten aseta testin ajaksi muuttuja `ALWAYS_SEND` = `true` (ks. alla).
+3. Testaa: **Actions → Pörssisähkövahti → Run workflow**. Rastita **Testiajo**, niin ilmoitus tulee, vaikka huominen ei olisi kallis.
 
 ### Asetukset (valinnaisia)
 **Settings → Secrets and variables → Actions → Variables**:
