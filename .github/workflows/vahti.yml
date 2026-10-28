@@ -1,0 +1,41 @@
+name: Pörssisähkövahti
+
+on:
+  schedule:
+    # Cron on UTC-aikaa: 13:30 UTC = klo 15:30 talviaikana, 16:30 kesäaikana.
+    # Nord Pool julkaisee huomisen hinnat yleensä n. klo 14 Suomen aikaa.
+    - cron: "30 13 * * *"
+  workflow_dispatch: # mahdollistaa käsin ajon Actions-välilehdeltä
+
+permissions:
+  issues: write # ilmoitukset tehdään issueina, GitHub lähettää niistä sähköpostin
+
+jobs:
+  vahti:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Tarkista huomisen hinnat
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NOTIFY_USERS: ${{ vars.NOTIFY_USERS || github.repository_owner }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          ALERT_AVG: ${{ vars.ALERT_AVG }}
+          ALERT_PEAK: ${{ vars.ALERT_PEAK }}
+          ALWAYS_SEND: ${{ vars.ALWAYS_SEND }}
+          WINDOW_HOURS: ${{ vars.WINDOW_HOURS }}
+        # Jos hinnat eivät ole vielä saatavilla, yritetään uudelleen 15 min välein (max 4 kertaa).
+        run: |
+          for i in 1 2 3 4; do
+            python vahti.py && exit 0
+            echo "Yritys $i epäonnistui, odotetaan 15 min..."
+            [ "$i" -lt 4 ] && sleep 900
+          done
+          exit 1
