@@ -20,7 +20,7 @@ Varmista, että sähköposti-ilmoitukset ovat päällä: GitHub → Settings →
 1. Luo GitHubiin **yksityinen** repo, esim. `porssisahko-vahti` (ilman README:tä). Yksityisessä repossa ajastus ei sammu 60 päivän jälkeen.
 2. Vie tiedostot repoon:
    ```
-   git remote add origin https://github.com/KAYTTAJA/porssisahko-vahti.git
+   git remote add origin https://github.com/kimmomakitalo/porssisahko-vahti.git
    git push -u origin main
    ```
 3. Testaa: **Actions → Pörssisähkövahti → Run workflow**. Halpana päivänä viestiä ei synny, joten aseta testin ajaksi muuttuja `ALWAYS_SEND` = `true` (ks. alla).
