@@ -206,7 +206,8 @@ def github_api(method, path, token, body=None):
         },
     )
     with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.load(resp)
+        raw = resp.read()
+        return json.loads(raw) if raw else None
 
 
 def create_issue(subject, markdown, cfg):
@@ -218,6 +219,8 @@ def create_issue(subject, markdown, cfg):
     users = " ".join(f"@{u}" for u in cfg["notify_users"])
     body = markdown + (f"\n\ncc {users}" if users else "")
     issue = github_api("POST", f"/repos/{repo}/issues", token, {"title": subject, "body": body})
+    # Julkisessa repossa kuka tahansa voisi kommentoida; lukitaan, ettei ilmoituksiin tule roskaa.
+    github_api("PUT", f"/repos/{repo}/issues/{issue['number']}/lock", token, {})
     print(f"Issue luotu: {issue['html_url']} (suljettu {len(old)} vanhaa)")
 
 

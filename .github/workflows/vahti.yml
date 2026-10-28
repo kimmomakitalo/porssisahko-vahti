@@ -9,6 +9,7 @@ on:
 
 permissions:
   issues: write # ilmoitukset tehdään issueina, GitHub lähettää niistä sähköpostin
+  actions: write # keepalive: ajastuksen pitäminen päällä
 
 jobs:
   vahti:
@@ -39,3 +40,11 @@ jobs:
             [ "$i" -lt 4 ] && sleep 900
           done
           exit 1
+      - name: Keepalive
+        # Julkisen repon ajastus sammuu 60 päivän hiljaiselon jälkeen; ajastuksen uudelleen
+        # aktivointi API:n kautta pitää sen päällä ilman turhia committeja.
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/vahti.yml/enable"
